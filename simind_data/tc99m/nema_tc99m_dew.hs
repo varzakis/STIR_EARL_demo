@@ -1,0 +1,27 @@
+!INTERFILE  :=
+!imaging modality := NM
+name of data file := nema_tc99m_dew.s
+originating system := simind
+!version of keys := 3.3
+!GENERAL DATA :=
+!GENERAL IMAGE DATA :=
+!type of data := Tomographic
+imagedata byte order := LITTLEENDIAN
+number of radionuclides := 1
+!SPECT STUDY (General) :=
+!number format := float
+!number of bytes per pixel := 4
+!number of projections := 120
+!extent of rotation := 360
+process status := acquired
+!SPECT STUDY (acquired data):=
+!direction of rotation := CW
+start angle := 180
+orbit := Non-circular
+Radii := {124.8, 125.57, 125.79, 126.15, 126.56, 126.91, 127.26, 127.92, 127.92, 128.66, 129.74, 130.5, 131.57, 132.57, 133.9, 134.89, 136.35, 137.47, 138.57, 140.24, 141.87, 143.14, 144.92, 146.66, 148.47, 149.91, 151.61, 153.33, 155.26, 156.68, 157.92, 160.03, 161.72, 163, 164, 165.03, 164.96, 166.12, 166.24, 166, 165.78, 165.13, 164.37, 163.29, 161.78, 159.87, 158.68, 157.41, 155.58, 153.44, 151.23, 148.63, 145.88, 142.79, 139.44, 136.36, 133.26, 129.97, 126.36, 122.42, 118.18, 122.54, 126.59, 130.31, 133.71, 136.93, 140.12, 143.58, 146.77, 149.63, 151.82, 154.55, 156.55, 158.8, 160.33, 161.43, 163.26, 165, 166.15, 166.97, 167.18, 167.93, 168.25, 167.87, 167.73, 167.16, 166.16, 165.18, 163.92, 162.23, 160.12, 159, 157.46, 155.52, 153.77, 152.04, 150.57, 148.72, 146.94, 145.1, 143.78, 142.09, 140.68, 139.18, 137.99, 136.45, 135.38, 133.96, 132.86, 131.7, 130.85, 129.67, 129.26, 128.71, 127.89, 127.48, 127.02, 126.5, 126.25, 125.68}
+
+!matrix size [1] := 256
+!scaling factor (mm/pixel) [1] := 2.2077
+!matrix size [2] := 256
+!scaling factor (mm/pixel) [2] := 2.2077
+!END OF INTERFILE :=

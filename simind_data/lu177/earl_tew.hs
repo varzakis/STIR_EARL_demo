@@ -1,0 +1,27 @@
+!INTERFILE  :=
+!imaging modality := NM
+name of data file := earl_tew.s
+originating system := simind
+!version of keys := 3.3
+!GENERAL DATA :=
+!GENERAL IMAGE DATA :=
+!type of data := Tomographic
+imagedata byte order := LITTLEENDIAN
+number of radionuclides := 1
+!SPECT STUDY (General) :=
+!number format := float
+!number of bytes per pixel := 4
+!number of projections := 120
+!extent of rotation := 360
+process status := acquired
+!SPECT STUDY (acquired data):=
+!direction of rotation := CW
+start angle := 180
+orbit := Non-circular
+Radii := {124.83, 125.84, 126.52, 126.88, 126.28, 126.95, 127.3, 127.98, 128.4, 128.75, 130.08, 130.01, 131.77, 132.94, 134.11, 134.93, 136.06, 137.5, 138.63, 140.18, 141.41, 142.25, 144.06, 145.76, 147.15, 148.81, 150.73, 152.58, 154.04, 155.09, 155.75, 158.1, 160.05, 161.56, 162.67, 163.36, 163.64, 164.12, 164.27, 164.08, 163.92, 162.02, 161.33, 160.88, 159.04, 156.8, 156.09, 155.02, 152.54, 151.63, 147.74, 146.71, 144.13, 141.25, 138.12, 135.25, 132.08, 128.51, 124.67, 120.49, 116, 120.72, 125.13, 129.21, 132.98, 136.39, 139.49, 142.83, 145.94, 148.71, 151.58, 154.04, 156.11, 157.13, 159.06, 159.93, 161.99, 164.32, 165.88, 167.02, 167.73, 168.02, 168.31, 168.23, 167.83, 167.63, 166.99, 165.93, 164.43, 162.51, 160.17, 159.5, 158.44, 156.94, 155.05, 153.08, 151.35, 149.86, 148.11, 146.21, 145.22, 142.78, 142.18, 140.94, 139.67, 138.08, 137.05, 135.06, 134.36, 133.51, 132.28, 130.67, 130.19, 129.55, 128.67, 128.09, 127.85, 127.57, 126.98, 126.08}
+
+!matrix size [1] := 128
+!scaling factor (mm/pixel) [1] := 4.4167
+!matrix size [2] := 128
+!scaling factor (mm/pixel) [2] := 4.4167
+!END OF INTERFILE :=

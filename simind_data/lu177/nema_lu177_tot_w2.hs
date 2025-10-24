@@ -1,0 +1,77 @@
+!INTERFILE :=
+!imaging modality := nucmed
+;# imaging modality 2 := EMS
+!originating system := simind
+!version of keys := 3.3
+;program author := M Ljungberg, Lund University
+;program version := V8.0
+  
+!GENERAL DATA :=
+;original institution := Medical Radiation Physics
+;contact person := M Ljungberg
+!data offset in bytes := 0
+!name of data file := nema_lu177_tot_w2.a00
+;patient name := SMC_nema_lu177_tot_w2.a00
+;!study ID := nema_lu177
+;data description := EMISSION
+;# Radionuclide := lu177
+;exam type := EMISSION
+;!patient ID := SIMIND
+  
+!GENERAL IMAGE DATA :=
+;patient position := FFS
+;patient orientation := head_in
+;decay corrected := Y
+!type of data := tomographic
+study date := 2025:10:24
+study time := 12:50:03
+imagedata byte order := LITTLEENDIAN
+energy window lower level[1] := 187.20
+energy window upper level[1] := 228.80
+;!total number of images := 120
+!number of energy windows := 1
+!matrix size [1] := 128
+!matrix size [2] := 128
+!number format := float
+!number of bytes per pixel := 4
+imagedata byte order := LITTLEENDIAN
+scaling factor (mm/pixel) [1] := 4.416700
+scaling factor (mm/pixel) [2] := 4.416700
+;# Image Position First image := -282.6688 -282.6688 282.668800
+;# Image Orientation := 1.0 0.0 0.0 0.0 0.0 -1.0
+;# Units of data (ECT) := counts
+  
+!SPECT STUDY (General) :=
+;number of detector heads := 1
+!extent of rotation := 360
+!process status := acquired
+!number of projections := 120
+;!number of images/energy window := 120
+;!time per projection (sec) := 1.000000
+number of time frames := 1
+image duration (sec) [1] := 120.000000
+maximum pixel count := 114.780258
+;# total counts := 17999.983810
+;# Center of Rotation := 65.000000
+  
+!SPECT STUDY (acquired data) :=
+orbit := non-circular
+;# Non-Uniform Orbit File := nema_lu177.cor
+Radii := {124.83000000000001,125.84,126.52,126.88000000000001,126.28,126.95,127.30000000000001,127.98,128.4,128.75,130.07999999999998,130.01,131.76999999999998,132.94,134.10999999999999,134.93,136.06,137.5,138.63,140.18,141.41,142.25,144.06,145.76,147.15,148.81,150.73000000000002,152.57999999999998,154.04,155.09,155.75,158.1,160.04999999999998,161.56,162.67,163.35999999999999,163.64000000000001,164.12,164.26999999999998,164.08,163.92,162.02,161.32999999999998,160.88,159.04,156.8,156.09,155.02,152.54,151.63,147.73999999999998,146.70999999999998,144.13,141.25,138.12,135.25,132.08,128.51000000000002,124.67,120.49,116.0,120.72,125.13,129.20999999999998,132.98,136.39,139.49,142.82999999999998,145.94,148.71,151.57999999999998,154.04,156.11,157.13,159.06,159.93,161.99,164.32,165.88,167.02,167.73,168.01999999999998,168.31,168.23000000000002,167.83,167.63000000000002,166.99,165.93,164.43,162.51000000000002,160.17,159.5,158.44,156.94,155.05,153.07999999999998,151.35,149.86,148.11,146.21,145.22,142.78,142.18,140.94,139.67000000000002,138.07999999999998,137.05,135.06,134.36,133.51000000000002,132.28,130.67000000000002,130.19,129.55,128.67000000000002,128.09,127.85,127.57,126.98,126.08000000000001}
+;acquisition mode := stepped
+!direction of rotation := CW
+start angle := 180
+;# X_offset := 0.000000
+  
+;# SIMIND-SPECIFIC PARAMETERS :=
+;# Intrinsic FWHM for the camera := 5.500000
+;# Total activity (MBq) in the slices := 11071.000000
+;# Collimator := gi-megp
+;# Collimator hole diameter := 3.000000
+;# Collimator hole septa := 1.050000
+;# Collimator thickness := 58.000000
+;# SIMIND: Photon Energy := 208.000000
+;# Crystal Thickness := 9.525000
+;# SIMIND: Time shift := -9999.000000
+  
+!END OF INTERFILE :=
