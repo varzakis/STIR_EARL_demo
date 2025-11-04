@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import math as m
 from pathlib import Path
+from typing import Optional
 
 
 def display(images, slc=0, plane=0, cmap='inferno', _min=0, _max=0):
@@ -260,6 +261,30 @@ def TEW_scatter_correction(PP: AcquisitionDataInterface, SC1: AcquisitionDataInt
 
     # return scatter corrected data
     return acq_data_corr
+
+
+def add_poisson_noise(acq_data: AcquisitionDataInterface,
+                      rng: Optional[np.random.Generator] = None
+                      ) -> AcquisitionDataInterface:
+    '''
+    Add Poisson noise to acquisition data and return a new instance with the noisy counts.
+
+    Parameters:
+    acq_data (AcquisitionDataInterface): The acquisition data to be perturbed.
+    rng (np.random.Generator, optional): Optional random generator for reproducibility.
+
+    Returns (AcquisitionDataInterface): Noisy acquisition data.
+    '''
+    if rng is None:
+        rng = np.random.default_rng()
+
+    counts = np.clip(acq_data.as_array(), a_min=0, a_max=None)
+
+    noisy_counts = rng.poisson(counts)
+
+    noisy_acq = acq_data.clone()
+    noisy_acq.fill(noisy_counts.astype(counts.dtype, copy=False))
+    return noisy_acq
 
 def update_par_file(par_file_path: str, output_par_path: str, updates: dict) -> str:
     '''

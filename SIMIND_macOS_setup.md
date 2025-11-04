@@ -7,7 +7,6 @@ This document describes the fixes required to run SIMIND on macOS with Apple Sil
 SIMIND is distributed as x86_64 (Intel) binaries. When running on Apple Silicon Macs, several issues arise:
 1. The binaries won't run without Rosetta 2 (Apple's x86_64 emulation layer)
 2. macOS Gatekeeper blocks unsigned binaries downloaded from the internet
-3. SIMIND requires the `SMC_DIR` environment variable to end with a trailing slash
 
 ## Solution Steps
 
@@ -54,37 +53,6 @@ codesign -s - simind_mpi
 codesign -s - smc2castor
 ```
 
-### 5. Fix SMC_DIR Environment Variable
-
-SIMIND requires `SMC_DIR` to end with a trailing slash (`/`).
-
-In your Python code or Jupyter notebook:
-```python
-import os
-from pathlib import Path
-
-simind_dir = Path('/path/to/your/project/simind')
-os.environ['SMC_DIR'] = str(simind_dir / 'smc_dir') + '/'  # Note the trailing slash
-os.environ['PATH'] = f"{simind_dir}:{os.environ.get('PATH', '')}"
-```
-
-**Important:** Without the trailing slash, SIMIND will fail with:
-```
-A final slash or backslash is needed to end the SMC_DIR environmental variable
-```
-
-## Verification
-
-Test that SIMIND runs correctly:
-
-```bash
-export SMC_DIR=/path/to/your/project/simind/smc_dir/
-export PATH=/path/to/your/project/simind:$PATH
-simind
-```
-
-You should see SIMIND error messages about missing input files (expected), not "Bad CPU type" or being killed.
-
 ## OS-Agnostic Jupyter Notebook Setup
 
 The notebook automatically detects the SIMIND installation:
@@ -110,7 +78,6 @@ This works on any OS (macOS, Linux, Windows with WSL) as long as SIMIND is insta
 |-------|-------|----------|
 | `Bad CPU type in executable` | Rosetta 2 not installed | Install Rosetta 2 (step 1) |
 | `Command died with <Signals.SIGKILL: 9>` | Unsigned binary or quarantine flag | Remove quarantine and sign binaries (steps 3-4) |
-| `A final slash or backslash is needed` | Missing trailing slash in `SMC_DIR` | Add `/` to end of `SMC_DIR` path (step 5) |
 | macOS popup: "cannot verify developer" | Quarantine flag set | Remove quarantine flag (step 3) |
 
 ## Performance Notes
