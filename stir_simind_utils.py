@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import os
 import shutil
-import sirf.STIR as spect
+from sirf_simind_connection.backends import AcquisitionDataInterface
 import numpy as np
-import numexpr as ne
-ne.set_num_threads(16) # use only 16 threads
 import sys
 import math as m
 from pathlib import Path
@@ -143,296 +141,312 @@ def extract_header_info(hdr, tag_str:str) -> str:
     return tag_value
 
 
-def replace_header_info(hdr_file:str, tag_str:str, replace_value:str):
-    '''
-    Changes the value for a certain tag in a header file.
-
-    Parameters:
-    hdr_file (str): The header filepath.
-    tag_str (str): The tag for which the value is to be extracted.
-    replace_value (str): The new value for the given tag.
-    
-    Returns: --
-    ''' 
-    # open the file and read all lines in a list
-    header_file = open(hdr_file, 'rt')
-    lines = header_file.readlines()
-    
-    # look for field_str in lines and identify the line number
-    line = None
-    for i in range(len(lines)):
-        if lines[i].find(tag_str) != -1:
-            line = i
-
-    # replace the value if the line number is found above
-    if line:
-        header_file = open(hdr_file, 'wt')
-        lines[line] = tag_str + ' := ' + replace_value + '\n'
-        header_file.writelines(lines)
-    else:
-        print('Tag not found!')
-
-    header_file.close()
-
-
-def replace_header_tag(hdr_file:str, tag_str_old:str, tag_str_new:str):
-    '''
-    Replaces a certain tag name with another in a header file, leaving the value intact.
-
-    Parameters:
-    hdr_file (str): The header filepath.
-    tag_str_old (str): The old tag.
-    tag_str_new (str): The new tag.
-    
-    Returns: --
-    '''
-    old_str_value = extract_header_info(hdr_file,tag_str_old)
-
-    # open the file and read all lines in a list
-    header_file = open(hdr_file, 'rt')
-    lines = header_file.readlines()
-    
-    # look for field_str in lines and identify the line number
-    line = None
-    for i in range(len(lines)):
-        if lines[i].find(tag_str_old) != -1:
-            line = i
-
-    if line:
-        header_file = open(hdr_file, 'wt') 
-        lines[line] = tag_str_new + ' := ' + old_str_value# + '\n'
-        header_file.writelines(lines)
-
-    header_file.close()
-
-
-def remove_header_info(hdr_file:str, tag_str:str):
-    '''
-    Removes a certain tag and value in a header file.
-
-    Parameters:
-    hdr_file (str): The header filepath.
-    tag_str (str): The tag to be removed.
-        
-    Returns: --
-    ''' 
-    # open the file and read all lines in a list
-    header_file = open(hdr_file, 'rt')
-    lines = header_file.readlines()
-    
-    # look for field_str in lines and identify the line number
-    line = None
-    for i in range(len(lines)):
-        if lines[i].find(tag_str) != -1:
-            line = i
-
-    if line:
-        header_file = open(hdr_file, 'wt')  
-        lines[line] = '\n'
-        header_file.writelines(lines)
-    else:
-        print('Tag not found!')
-
-    header_file.close()
-
-
-def add_header_info(hdr_file:str, tag_name:str, tag_value:str, place_before_tag:str='!END OF INTERFILE :='):
-    '''
-    Adds a certain tag and its value in a header file.
-
-    Parameters:
-    hdr_file (str): The header filepath.
-    tag_name (str): The tag name to be added.
-    tag_value (str): The tag value to be added
-        
-    Returns: --
-    ''' 
-    # open the file and read all lines in a list
-    header_file = open(hdr_file, 'rt')
-    lines = header_file.readlines()
-    
-    # look for field_str in lines and identify the line number
-    line = None
-    lines_new = []
-    for i in range(len(lines)):
-        if lines[i].find(place_before_tag) != -1:
-            lines_new.append(f'{tag_name} := {tag_value}\n')
-        lines_new.append(lines[i])
-
-    header_file = open(hdr_file, 'wt')
-    header_file.writelines(lines_new)
-    header_file.close()
-
-
-def convert_simind_to_stir(simind_header_fp:str,contour_file=None):
-    if not simind_header_fp.endswith('.h00'):
-        print("This doesn't seem to be a simind header file. It should end with .h00!")
-        sys.exit()
-
-    stir_header_fp = f'{simind_header_fp[:-4]}.hs'
-    shutil.copyfile(simind_header_fp,stir_header_fp)
-    
-    replace_header_tag(stir_header_fp,'program author',';program author')
-    replace_header_tag(stir_header_fp,'program version',';program version')
-    replace_header_tag(stir_header_fp,'original institution',';original institution')
-    replace_header_tag(stir_header_fp,'contact person',';contact person')
-    replace_header_tag(stir_header_fp,'patient name',';patient name')
-    replace_header_tag(stir_header_fp,'!study ID',';!study ID')
-    replace_header_tag(stir_header_fp,'data description',';data description')
-    replace_header_tag(stir_header_fp,'exam type',';exam type')
-    replace_header_tag(stir_header_fp,'!patient ID',';!patient ID')
-    replace_header_tag(stir_header_fp,'patient position',';patient position')
-    replace_header_tag(stir_header_fp,'patient orientation',';patient orientation')
-    replace_header_tag(stir_header_fp,'patient orientation',';patient orientation')
-    replace_header_tag(stir_header_fp,';energy window lower level','energy window lower level[1]')
-    replace_header_tag(stir_header_fp,';energy window upper level','energy window upper level[1]')
-    replace_header_tag(stir_header_fp,'!total number of images',';!total number of images')
-    replace_header_info(stir_header_fp,'!number format', 'float')
-    replace_header_tag(stir_header_fp,'number of detector heads',';number of detector heads')
-    replace_header_tag(stir_header_fp,'!number of images/energy window',';!number of images/energy window')
-    replace_header_tag(stir_header_fp,'!time per projection (sec)',';!time per projection (sec)')
-    add_header_info(stir_header_fp,'number of time frames','1','image duration (sec)')
-    replace_header_tag(stir_header_fp,'image duration (sec)','image duration (sec) [1]')
-    if extract_header_info(simind_header_fp,'orbit') == 'noncircular\n':
-        replace_header_info(stir_header_fp,'orbit','non-circular')
-        countour_f = open(contour_file,'rt')
-        radii_from_file = countour_f.readlines()
-        radial_position = []
-        for angle in radii_from_file:
-            radial_position.append(float(angle.split('      ')[1].split('  ')[0])*10)
-        radial_position_string = ','.join(map(str, radial_position))
-        radial_position_string = '{' + radial_position_string + '}'
-        countour_f.close()    
-    add_header_info(stir_header_fp,'Radii',radial_position_string,'acquisition mode')
-    replace_header_tag(stir_header_fp,'acquisition mode',';acquisition mode')
-    replace_header_info(stir_header_fp,'start angle','180')
-
-
-def DEW_scatter_correction(PP, SC) -> spect.AcquisitionData:
+def DEW_scatter_correction(PP: AcquisitionDataInterface, SC: AcquisitionDataInterface,
+                           PP_bounds=None, SC_bounds=None) -> AcquisitionDataInterface:
     '''
     Performs scatter correction with the Dual Energy Window method. Negative values
     are clipped after the operation.
 
     Parameters:
-    PP (AcquisitionData or str): The acquisition data or header filepath of the photopeak window.
-    SC (AcquisitionData or str): The acquisition data or header filepath of the scatter window.
+    PP (AcquisitionDataInterface): The acquisition data of the photopeak window.
+    SC (AcquisitionDataInterface): The acquisition data of the scatter window.
+    PP_bounds (tuple, optional): (lower, upper) energy bounds for PP window in keV.
+                                 If None, will extract from PP acquisition data.
+    SC_bounds (tuple, optional): (lower, upper) energy bounds for SC window in keV.
+                                 If None, will extract from SC acquisition data.
 
-    Returns (AcquisitionData): The scatter corrected projections.
+    Returns (AcquisitionDataInterface): The scatter corrected projections.
     '''
 
-    if type(PP) is str:
-        acq_data_PP = spect.AcquisitionData(PP)
-    else:
-        acq_data_PP = PP.clone()
-    acq_data_PP_arr = acq_data_PP.as_array()
+    acq_data_PP = PP.clone()
+    acq_data_SC = SC.clone()
 
-    if type(SC) is str:
-        acq_data_SC = spect.AcquisitionData(SC)
+    # Get energy window bounds - either from parameters or from acquisition data
+    if PP_bounds is None:
+        lo_PP, hi_PP = acq_data_PP.get_energy_window_bounds()
     else:
-        acq_data_SC = SC.clone()
-    acq_data_SC_arr = acq_data_SC.as_array()
+        lo_PP, hi_PP = PP_bounds
+    window_width_PP = hi_PP - lo_PP
+    print(f'PP window width: {str(round(window_width_PP, 2))}')
 
-    # Indicate header tags to extract, i.e. lower energy level and higher energy level
-    lo_tag = 'energy window lower level[1]'
-    hi_tag = 'energy window upper level[1]'
-    
-    # open header file, extract tags and generate window width
-    # PHOTOPEAK
-    lo = float(extract_header_info(PP, lo_tag))
-    hi = float(extract_header_info(PP, hi_tag))
-    window_width_PP = hi -lo
-    print(f'PP window width: {str(round(window_width_PP,2))}')
-    
-    # SCATTER WINDOW
-    lo = float(extract_header_info(SC, lo_tag))
-    hi = float(extract_header_info(SC, hi_tag))
-    window_width_SC = hi - lo
-    print(f'SC window width: {str(round(window_width_SC,2))}')
-    
-    # estimate scatter under photopeak with DEW method    
-    acq_data_scatter_DEW_arr = (acq_data_SC_arr / window_width_SC) * window_width_PP / 2
-    print(f'Scatter fraction: {str(round((window_width_PP/window_width_SC) / 2, 2))}')
-    
-    # scatter corrected data
-    acq_data_corr_arr = acq_data_PP_arr - acq_data_scatter_DEW_arr
-        
-    # set negative values to zero
-    acq_data_corr_clipped_arr = acq_data_corr_arr.clip(min=0)
-    
-    # create AcquisitionData object for scatter corrected data
-    acq_data_corr_clipped = acq_data_PP.clone()
-    acq_data_corr_clipped.fill(acq_data_corr_clipped_arr)
-    
+    if SC_bounds is None:
+        lo_SC, hi_SC = acq_data_SC.get_energy_window_bounds()
+    else:
+        lo_SC, hi_SC = SC_bounds
+    window_width_SC = hi_SC - lo_SC
+    print(f'SC window width: {str(round(window_width_SC, 2))}')
+
+    # Calculate scatter fraction
+    scatter_fraction = (window_width_PP / window_width_SC) / 2
+    print(f'Scatter fraction: {str(round(scatter_fraction, 2))}')
+
+    # Estimate scatter under photopeak with DEW method using AcquisitionData operations
+    # Formula: scatter = (SC / window_width_SC) * window_width_PP / 2
+    acq_data_scatter = acq_data_SC * scatter_fraction
+
+    # Scatter corrected data using AcquisitionData subtraction
+    acq_data_corr = acq_data_PP - acq_data_scatter
+
+    # Set negative values to zero using numpy array operations
+    acq_data_corr_arr = acq_data_corr.as_array()
+    acq_data_corr_arr[acq_data_corr_arr < 0] = 0
+    acq_data_corr.fill(acq_data_corr_arr)
+
     # return scatter corrected data
-    return acq_data_corr_clipped
+    return acq_data_corr
 
 
-def TEW_scatter_correction(PP, SC1, SC2) -> spect.AcquisitionData:
+def TEW_scatter_correction(PP: AcquisitionDataInterface, SC1: AcquisitionDataInterface,
+                           SC2: AcquisitionDataInterface, PP_bounds=None, SC1_bounds=None,
+                           SC2_bounds=None) -> AcquisitionDataInterface:
     '''
     Performs scatter correction with the Triple Energy Window method. Negative values
     are clipped after the operation.
 
     Parameters:
-    PP (AcquisitionData or str): The acquisition data or header filepath of the photopeak window.
-    SC1 (AcquisitionData or str): The acquisition data or header filepath of one of the scatter windows.
-    SC2 (AcquisitionData or str): The acquisition data or header filepath of the other scatter window.
+    PP (AcquisitionDataInterface): The acquisition data of the photopeak window.
+    SC1 (AcquisitionDataInterface): The acquisition data of one of the scatter windows.
+    SC2 (AcquisitionDataInterface): The acquisition data of the other scatter window.
+    PP_bounds (tuple, optional): (lower, upper) energy bounds for PP window in keV.
+                                 If None, will extract from PP acquisition data.
+    SC1_bounds (tuple, optional): (lower, upper) energy bounds for SC1 window in keV.
+                                  If None, will extract from SC1 acquisition data.
+    SC2_bounds (tuple, optional): (lower, upper) energy bounds for SC2 window in keV.
+                                  If None, will extract from SC2 acquisition data.
 
-    Returns (AcquisitionData): The scatter corrected projections.
+    Returns (AcquisitionDataInterface): The scatter corrected projections.
     '''
-    
-    if type(PP) is str:
-        acq_data_PP = spect.AcquisitionData(PP)
-    else:
-        acq_data_PP = PP.clone()
-    acq_data_PP_arr = acq_data_PP.as_array()
 
-    if type(SC1) is str:
-        acq_data_SC1 = spect.AcquisitionData(SC1)
+    acq_data_PP = PP.clone()
+    acq_data_SC1 = SC1.clone()
+    acq_data_SC2 = SC2.clone()
+
+    # Get energy window bounds - either from parameters or from acquisition data
+    if PP_bounds is None:
+        lo_PP, hi_PP = acq_data_PP.get_energy_window_bounds()
     else:
-        acq_data_SC1 = SC1.clone()
-    acq_data_SC1_arr = acq_data_SC1.as_array()
-    
-    if type(SC2) is str:
-        acq_data_SC2 = spect.AcquisitionData(SC2)
+        lo_PP, hi_PP = PP_bounds
+    window_width_PP = hi_PP - lo_PP
+    print(f'PP window width: {str(round(window_width_PP, 2))}')
+
+    if SC1_bounds is None:
+        lo_SC1, hi_SC1 = acq_data_SC1.get_energy_window_bounds()
     else:
-        acq_data_SC2 = SC2.clone()
-    acq_data_SC2_arr = acq_data_SC2.as_array()
-    
-    # Indicate header tags to extract, i.e. lower energy level and higher energy level
-    lo_tag = 'energy window lower level[1]'
-    hi_tag = 'energy window upper level[1]'
-    
-    # open header file, extract tags and generate window width
-    # PHOTOPEAK
-    lo = float(extract_header_info(PP, lo_tag))
-    hi = float(extract_header_info(PP, hi_tag))
-    window_width_PP = hi -lo
-    print(f'PP window width: {str(round(window_width_PP,2))}')
-    
-    # SCATTER WINDOW 1
-    lo = float(extract_header_info(SC1, lo_tag))
-    hi = float(extract_header_info(SC1, hi_tag))
-    window_width_SC1 = hi - lo            
-    print(f'SC1 window width: {str(round(window_width_SC1,2))}')
-    
-    # SCATTER WINDOW 2
-    lo = float(extract_header_info(SC2, lo_tag))
-    hi = float(extract_header_info(SC2, hi_tag))
-    window_width_SC2 = hi - lo
-    print(f'SC2 window width: {str(round(window_width_SC2,2))}')
-    
-    # estimate scatter under photopeak with TEW method    
-    acq_data_scatter_TEW_arr = ((acq_data_SC1_arr / window_width_SC1) + (acq_data_SC2_arr / window_width_SC2)) * window_width_PP / 2
-    
-    # scatter corrected data
-    acq_data_corr_arr = acq_data_PP_arr - acq_data_scatter_TEW_arr
-    
-    # set negative values to zero    
-    acq_data_corr_clipped_arr = acq_data_corr_arr.clip(min=0)
-    
-    # create AcquisitionData object for scatter corrected data
-    acq_data_corr_clipped = acq_data_PP.clone()
-    acq_data_corr_clipped.fill(acq_data_corr_clipped_arr)
-    
+        lo_SC1, hi_SC1 = SC1_bounds
+    window_width_SC1 = hi_SC1 - lo_SC1
+    print(f'SC1 window width: {str(round(window_width_SC1, 2))}')
+
+    if SC2_bounds is None:
+        lo_SC2, hi_SC2 = acq_data_SC2.get_energy_window_bounds()
+    else:
+        lo_SC2, hi_SC2 = SC2_bounds
+    window_width_SC2 = hi_SC2 - lo_SC2
+    print(f'SC2 window width: {str(round(window_width_SC2, 2))}')
+
+    # Estimate scatter under photopeak with TEW method using AcquisitionData operations
+    # Formula: scatter = ((SC1 / width_SC1) + (SC2 / width_SC2)) * width_PP / 2
+    scatter_fraction_1 = window_width_PP / (2 * window_width_SC1)
+    scatter_fraction_2 = window_width_PP / (2 * window_width_SC2)
+
+    acq_data_scatter = acq_data_SC1 * scatter_fraction_1 + acq_data_SC2 * scatter_fraction_2
+
+    # Scatter corrected data using AcquisitionData subtraction
+    acq_data_corr = acq_data_PP - acq_data_scatter
+
+    # Set negative values to zero using numpy array operations
+    acq_data_corr_arr = acq_data_corr.as_array()
+    acq_data_corr_arr[acq_data_corr_arr < 0] = 0
+    acq_data_corr.fill(acq_data_corr_arr)
+
     # return scatter corrected data
-    return acq_data_corr_clipped
+    return acq_data_corr
+
+def update_par_file(par_file_path: str, output_par_path: str, updates: dict) -> str:
+    '''
+    Update parameters in a STIR par file and save to a new location.
+    Only updates lines that exactly match the parameter name (before :=).
+
+    Parameters:
+    par_file_path (str): Path to the original par file.
+    output_par_path (str): Path where the updated par file will be saved.
+    updates (dict): Dictionary of parameter names and their new values.
+                    Example: {'input file': 'data.hs', 'output filename prefix': 'recon_result'}
+
+    Returns (str): Path to the updated par file.
+    '''
+    # Read the original par file
+    with open(par_file_path, 'r') as f:
+        lines = f.readlines()
+
+    # Update parameters - be more precise with matching
+    updated_lines = []
+    for line in lines:
+        line_updated = False
+
+        # Only process lines with :=
+        if ':=' in line:
+            # Extract the parameter name (text before :=)
+            param_name_in_line = line.split(':=')[0].strip()
+
+            # Check if this parameter should be updated
+            for param_name, param_value in updates.items():
+                if param_name_in_line.lower() == param_name.lower():
+                    # Extract indentation
+                    indent = len(line) - len(line.lstrip())
+                    updated_lines.append(' ' * indent + f'{param_name} := {param_value}\n')
+                    line_updated = True
+                    break
+
+        if not line_updated:
+            updated_lines.append(line)
+
+    # Write the updated par file
+    with open(output_par_path, 'w') as f:
+        f.writelines(updated_lines)
+
+    return output_par_path
+
+
+def reconstruct_with_osem(input_file: str, output_prefix: str, par_file_template: str,
+                          initial_image_template, attenuation_image, num_subsets: int = 4,
+                          num_subiterations: int = 24, temp_dir: str = './temp_recon'):
+    '''
+    Perform OSEM reconstruction using STIR with a modified par file.
+
+    Parameters:
+    input_file (str): Path to the input acquisition data (.hs file).
+    output_prefix (str): Prefix for output files.
+    par_file_template (str): Path to the template par file.
+    initial_image_template: STIR image object to use as template for initial image.
+    attenuation_image: STIR image object containing attenuation map.
+    num_subsets (int): Number of subsets for OSEM (default: 4).
+    num_subiterations (int): Number of subiterations (default: 24).
+    temp_dir (str): Directory for temporary files (default: './temp_recon').
+
+    Returns: The reconstructed image (stir.FloatVoxelsOnCartesianGrid).
+    '''
+    import stir
+    from pathlib import Path
+
+    # Create temp directory if it doesn't exist
+    Path(temp_dir).mkdir(parents=True, exist_ok=True)
+
+    # Convert all paths to absolute paths
+    temp_dir_abs = os.path.abspath(temp_dir)
+    input_file_abs = os.path.abspath(input_file)
+    par_file_template_abs = os.path.abspath(par_file_template)
+
+    # Create and save required images
+    # 1. Initial estimate
+    target = initial_image_template.clone()
+    target.fill(1.0)
+    init_file = os.path.join(temp_dir_abs, f'{output_prefix}_init.hv')
+    target.write_to_file(init_file)
+
+    # 2. Attenuation map
+    atten_file = os.path.join(temp_dir_abs, f'{output_prefix}_atten.hv')
+    attenuation_image.write_to_file(atten_file)
+
+    # 3. Mask (create from attenuation map - non-zero values)
+    mask = attenuation_image.clone()
+    mask_arr = mask.as_array()
+    mask_arr[mask_arr > 0] = 1.0
+    mask.fill(mask_arr)
+    mask_file = os.path.join(temp_dir_abs, f'{output_prefix}_mask.hv')
+    mask.write_to_file(mask_file)
+
+    # Create modified par file with all necessary paths
+    temp_par_file = os.path.join(temp_dir_abs, f'{output_prefix}_recon.par')
+    updates = {
+        'input file': input_file_abs,
+        'output filename prefix': os.path.join(temp_dir_abs, output_prefix),
+        'initial estimate': init_file,
+        'attenuation map': atten_file,
+        'mask file': mask_file,
+        'number of subsets': num_subsets,
+        'number of subiterations': num_subiterations,
+    }
+
+    update_par_file(par_file_template_abs, temp_par_file, updates)
+
+    # Initialize reconstruction object
+    recon = stir.OSMAPOSLReconstruction3DFloat(temp_par_file)
+
+    # Set up reconstruction
+    s = recon.set_up(target)
+    if not s.succeeded():
+        raise RuntimeError(f'Error setting up reconstruction for {output_prefix}')
+
+    # Run reconstruction
+    print(f'Running reconstruction for {output_prefix}...')
+    print(f'  Input file: {input_file}')
+    print(f'  Subsets: {num_subsets}, Subiterations: {num_subiterations}')
+
+    recon.set_start_subiteration_num(1)
+    recon.set_num_subiterations(num_subiterations)
+    s = recon.reconstruct(target)
+
+    if not s.succeeded():
+        raise RuntimeError(f'Reconstruction failed for {output_prefix}')
+
+    # Save the reconstructed image
+    output_filename = os.path.join(temp_dir, f'{output_prefix}.hv')
+    target.write_to_file(output_filename)
+    print(f'Reconstruction complete. Saved to: {output_filename}')
+
+    return target
+
+
+def compare_reconstructions(recon_dict: dict, slice_idx: int = None, cmap: str = 'hot',
+                           vmin: float = None, vmax: float = None):
+    '''
+    Compare multiple reconstructed images side by side.
+
+    Parameters:
+    recon_dict (dict): Dictionary of {name: stir.FloatVoxelsOnCartesianGrid} pairs.
+    slice_idx (int, optional): Slice index to display. If None, uses middle slice.
+    cmap (str): Colormap for display (default: 'hot').
+    vmin (float, optional): Minimum value for color scale.
+    vmax (float, optional): Maximum value for color scale.
+
+    Returns: matplotlib figure and axes objects.
+    '''
+    n_images = len(recon_dict)
+    fig, axes = plt.subplots(1, n_images, figsize=(6*n_images, 5))
+
+    if n_images == 1:
+        axes = [axes]
+
+    # Get all arrays for consistent scaling
+    arrays = []
+    for name, img in recon_dict.items():
+        if hasattr(img, 'as_array'):
+            arr = img.as_array()
+        else:
+            arr = img
+        arrays.append(arr)
+
+    # Determine slice index if not provided
+    if slice_idx is None:
+        slice_idx = arrays[0].shape[0] // 2
+
+    # Determine color scale if not provided
+    if vmin is None or vmax is None:
+        all_data = np.concatenate([arr[slice_idx, :, :].flatten() for arr in arrays])
+        if vmin is None:
+            vmin = np.min(all_data)
+        if vmax is None:
+            vmax = np.max(all_data)
+
+    # Plot each image
+    for idx, (name, img) in enumerate(recon_dict.items()):
+        arr = arrays[idx]
+        im = axes[idx].imshow(arr[slice_idx, :, :], cmap=cmap, vmin=vmin, vmax=vmax)
+        axes[idx].set_title(name, fontsize=14, fontweight='bold')
+        axes[idx].axis('off')
+        plt.colorbar(im, ax=axes[idx], fraction=0.046, pad=0.04)
+
+    fig.suptitle(f'Reconstruction Comparison (Slice {slice_idx})', fontsize=16, fontweight='bold')
+    plt.tight_layout()
+
+    return fig, axes
