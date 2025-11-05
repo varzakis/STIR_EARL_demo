@@ -35,7 +35,7 @@ The EARL (EANM Research Ltd.) program provides guidelines and accreditation for 
 
 ```bash
 # Clone repositories
-git clone <this-repo-url> STIR_EARL_demo
+git clone (https://github.com/varzakis/STIR_EARL_demo.git)
 cd STIR_EARL_demo
 
 # Clone dependencies (adjust paths as needed)
