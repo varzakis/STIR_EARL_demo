@@ -5,7 +5,7 @@ Demonstration of SPECT simulation and reconstruction workflow for EARL (EANM Res
 ## About
 
 ### EARL Standard
-The EARL (EANM Research Ltd.) program provides guidelines and accreditation for quantitative PET/SPECT imaging. This demo uses the EARL NEMA IEC Body Phantom specification with 6 spheres to demonstrate a complete SPECT workflow including Monte Carlo simulation, scatter correction, and OSEM reconstruction.
+The EARL (EANM Research Ltd.) program provides guidelines and accreditation for quantitative SPECT imaging. This demo uses the EARL NEMA IEC Body Phantom specification with 6 spheres to demonstrate a complete SPECT workflow including Monte Carlo simulation, scatter correction, and OSEM reconstruction.
 
 ### Key Packages
 
