@@ -35,13 +35,13 @@ The EARL (EANM Research Ltd.) program provides guidelines and accreditation for 
 
 ```bash
 # Clone repositories
-git clone (https://github.com/varzakis/STIR_EARL_demo.git)
+git clone https://github.com/varzakis/STIR_EARL_demo.git
 cd STIR_EARL_demo
 
 # Clone dependencies (adjust paths as needed)
 cd ..
-git clone https://github.com/<org>/SIRF-SIMIND-Connection.git
-git clone https://github.com/<org>/phantomgen.git
+git clone https://github.com/samdporter/SIRF-SIMIND-Connection.git
+git clone https://github.com/varzakis/phantomgen.git
 cd STIR_EARL_demo
 
 # Create conda environment
@@ -119,8 +119,8 @@ pip install -e ../phantomgen
 ## Citation
 
 If you use this demo, please cite:
-- STIR: [reference]
-- SIMIND: [reference]
+- STIR: https://stir.sourceforge.net/documentation/STIR-UsersGuide.pdf
+- SIMIND: Ljungberg and S.-E. Strand, Computer Methods and Programs in Biomedicine, vol. 29, no. 4, pp. 257–272, Aug. 1989,
 - EARL: https://earl.eanm.org/
 
 ## License
