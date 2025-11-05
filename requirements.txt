@@ -1,0 +1,20 @@
+# Core scientific packages
+numpy>=1.20.0
+matplotlib>=3.3.0
+scipy>=1.7.0
+
+# Jupyter for notebooks
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# SIRF-SIMIND-Connection - interfaces STIR with SIMIND
+# Install from local clone: pip install -e ../SIRF-SIMIND-Connection
+# Or directly from git:
+# git+https://github.com/<org>/SIRF-SIMIND-Connection.git
+
+# phantomgen - NEMA phantom generation
+# Install from local clone: pip install -e ../phantomgen
+# Or directly from git:
+# git+https://github.com/<org>/phantomgen.git
+
+# Note: STIR is installed via conda (see environment.yml)
