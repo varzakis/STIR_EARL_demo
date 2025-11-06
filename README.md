@@ -41,7 +41,7 @@ cd STIR_EARL_demo
 # Clone dependencies (adjust paths as needed)
 cd ..
 git clone https://github.com/samdporter/SIRF-SIMIND-Connection.git
-git clone https://github.com/varzakis/phantomgen.git
+git clone https://github.com/varzakis/phantomgen/tree/offset-and-supersampling
 cd STIR_EARL_demo
 
 # Create conda environment
